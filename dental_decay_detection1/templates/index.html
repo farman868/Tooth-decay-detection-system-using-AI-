@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DentalAI View</title>
+
+    <!-- Materialize + icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+
+    <!-- project styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#home">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="DentalAI" class="logo" onerror="this.style.display='none'">
+      <span class="brand-title">DentalAI View</span>
+    </a>
+
+    <button id="navToggle" class="nav-toggle" aria-label="Toggle navigation">
+      <span class="hamburger"></span>
+    </button>
+
+    <nav id="topNav" class="top-nav" aria-label="Primary">
+      <a href="#home">Home</a>
+      <a href="#decay">Understanding Decay</a>
+      <a href="#analysis">Try Demo</a>
+    </nav>
+
+    <a class="try-demo" href="#analysis">Try Demo</a>
+  </div>
+</header>
+
+<main>
+    <section id="home" class="hero container">
+        <div class="hero-left">
+            <h1>Advanced Tooth Decay<br><span class="accent">AI Analysis</span></h1>
+            <p class="lead">Our AI helps detect and visualize tooth decay at early stages so you can act sooner.</p>
+            <div class="hero-cta">
+                <a class="btn-large" href="#analysis">Start Analysis</a>
+                <a class="btn-flat" href="#decay">Learn more</a>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="hero-image-frame">
+                <img src="{{ url_for('static', filename='dentist.jpeg') }}" alt="Dental Checkup">
+                <div class="image-caption">AI-powered analysis in progress</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="decay" class="container section-decay">
+        <h2 class="section-title center">Understanding Tooth Decay</h2>
+
+<div class="stages">
+    <div class="decay-card accent-blue">
+        <div class="top-accent"></div>
+        <div class="stage-body">
+            <div class="stage-icon">1</div>
+            <h4>Demineralization</h4>
+            <p>Earliest stage where minerals begin to weaken enamel and white spots may appear.</p>
+        </div>
+    </div>
+
+    <div class="decay-card accent-orange">
+        <div class="top-accent"></div>
+        <div class="stage-body">
+            <div class="stage-icon">2</div>
+            <h4>Enamel Decay</h4>
+            <p>Bacteria break down enamel creating visible defects, discoloration or small holes.</p>
+        </div>
+    </div>
+
+    <div class="decay-card accent-yellow">
+        <div class="top-accent"></div>
+        <div class="stage-body">
+            <div class="stage-icon">3</div>
+            <h4>Dentin Decay</h4>
+            <p>Decay reaches dentin causing sensitivity and progression toward deeper tissues.</p>
+        </div>
+    </div>
+
+    <div class="decay-card accent-red">
+        <div class="top-accent"></div>
+        <div class="stage-body">
+            <div class="stage-icon">4</div>
+            <h4>Pulp Damage</h4>
+            <p>Severe decay reaching the pulp — pain, infection and urgent treatment required.</p>
+        </div>
+    </div>
+</div>
+
+        <div class="tips">
+            <h5>Prevention Tips</h5>
+            <ul>
+                <li>Brush twice daily with fluoride toothpaste</li>
+                <li>Floss daily to remove plaque</li>
+                <li>Limit sugary foods and drinks</li>
+                <li>Visit your dentist regularly</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="analysis" class="container section-analysis">
+        <h2 class="section-title center">AI-Powered Tooth Analysis</h2>
+
+        <div class="analysis-grid">
+            <div class="analysis-left card">
+                <h5>Upload X‑ray</h5>
+                {% if message %}
+                <div class="notice">{{ message }}</div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="upload-form">
+                    <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Choose</span>
+                            <input type="file" name="file" accept="image/*,.nrrd" required>
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text" placeholder="Upload tooth X‑ray">
+                        </div>
+                    </div>
+                    <button class="btn full-width" type="submit">Analyze</button>
+                </form>
+
+                {% if decay_percent %}
+                <div class="result-summary card-panel">
+                    <p><strong>Decay Area:</strong> {{ decay_percent }}%</p>
+                    <p><strong>Advice:</strong> {{ advice_text }}</p>
+                    <a class="btn-small" href="{{ url_for('download_report') }}">Download Report</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="analysis-right card">
+                <h5>Viewer</h5>
+
+                {% if image_data_orig or image_data %}
+                <div class="side-by-side-images">
+                    {% if image_data_orig %}
+                    <div class="img-block">
+                        <div class="img-title">Input</div>
+                        <img class="zoomable" src="data:image/jpeg;base64,{{ image_data_orig }}" alt="Original">
+                    </div>
+                    {% endif %}
+
+                    {% if image_data %}
+                    <div class="img-block">
+                        <div class="img-title">Prediction</div>
+                        <img class="zoomable" src="data:image/jpeg;base64,{{ image_data }}" alt="Prediction">
+                        <a class="btn-small" href="data:image/jpeg;base64,{{ image_data }}" download="prediction.jpg">Download</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="empty-state">Upload an X‑ray to see predictions here.</div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="modal-image" class="modal">
+    <div class="modal-content">
+        <img id="modal-img" src="" alt="Zoom" style="width:100%;height:auto;">
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close btn-flat">Close</a>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    M.AutoInit();
+
+    const elems = document.querySelectorAll('.modal');
+    M.Modal.init(elems, {});
+
+    const zoomable = document.querySelectorAll('.zoomable');
+    zoomable.forEach(img => {
+        img.addEventListener('click', function () {
+            const src = this.getAttribute('src');
+            const modal = M.Modal.getInstance(document.getElementById('modal-image'));
+            document.getElementById('modal-img').setAttribute('src', src);
+            modal.open();
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const btn = document.getElementById('navToggle');
+  const nav = document.getElementById('topNav');
+  btn && btn.addEventListener('click', () => nav.classList.toggle('open'));
+});
+</script>
+
+</body>
+</html>
